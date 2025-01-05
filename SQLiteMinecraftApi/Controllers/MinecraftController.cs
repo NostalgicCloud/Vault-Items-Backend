@@ -19,7 +19,7 @@ namespace SQLiteMinecraftApi.Controllers
         }
 
         [HttpPost("depositbulk")]
-        public async Task<IActionResult> StoreAllItems([FromBody]MinecraftItem items)
+        public async Task<IActionResult> StoreAllItems([FromBody] MinecraftItem items)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace SQLiteMinecraftApi.Controllers
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
-        }     
+        }
 
         [HttpGet("getall")]
         public async Task<IActionResult> ListItems([FromQuery] string playerName)
@@ -93,7 +93,7 @@ namespace SQLiteMinecraftApi.Controllers
             };
 
             return Ok(result);
-        }     
-        
+        }
+
     }
 }
