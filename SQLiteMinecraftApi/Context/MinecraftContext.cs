@@ -43,16 +43,18 @@ namespace SQLiteMinecraftApi.Context
     public class MinecraftContext : DbContext
     {
         public DbSet<MinecraftItem> MinecraftItems { get; set; }
-
-        public MinecraftContext(DbContextOptions<MinecraftContext> options)
+        private readonly IConfiguration _configuration;
+        public MinecraftContext(DbContextOptions<MinecraftContext> options, IConfiguration configuration)
             : base(options)
         {
-
+            _configuration = configuration;
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql("Server=localhost;Database=minecraftprod;User=root;Password=admin;Port=3306;",
-                new MySqlServerVersion(new Version(8, 0, 21)));
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite(_configuration.GetConnectionString("MinecraftDatabase"));
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -77,5 +79,4 @@ namespace SQLiteMinecraftApi.Context
             return await MinecraftItems.Where(item => item.UUID == uuid).ToListAsync();
         }
     }
-
 }

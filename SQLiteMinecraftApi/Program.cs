@@ -1,4 +1,3 @@
-
 using System.Diagnostics;
 using SQLiteMinecraftApi.Context;
 using SQLiteMinecraftApi.Services;
@@ -12,13 +11,11 @@ namespace SQLiteMinecraftApi
         {
             try
             {
-
                 var builder = WebApplication.CreateBuilder(args);
 
                 // Add services to the container.
                 builder.Services.AddDbContext<MinecraftContext>(options =>
-                    options.UseMySql(builder.Configuration.GetConnectionString("MinecraftDatabase"),
-                        new MySqlServerVersion(new Version(8, 0, 21))));
+                    options.UseSqlite(builder.Configuration.GetConnectionString("MinecraftDatabase")));
                 builder.Services.AddScoped<IMinecraftServices, MinecraftServices>();
                 builder.Services.AddMemoryCache(); // Add this line to enable in-memory caching
 
@@ -45,16 +42,19 @@ namespace SQLiteMinecraftApi
                             FileName = "https://localhost:5000/swagger",
                             UseShellExecute = true
                         });
-
                     }
                 }
 
-
+                // Ensure the database is created and migrated
+                using (var scope = app.Services.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<MinecraftContext>();
+                    dbContext.Database.Migrate();
+                }
 
                 app.UseHttpsRedirection();
 
                 app.UseAuthorization();
-
 
                 app.MapControllers();
 
